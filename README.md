@@ -12,11 +12,21 @@ FeatureImageExtension can be applied to a content page, and gives it behaviours 
 
  *  Apply the FeatureImageExtension to any page types that you want the
     feature on. This can be done in *mysite/_config/app.yml*.
+    
+````
+Page:
+	extensions:
+		- FeaturedImagesExtension
+````
+    
  *  In the template, use ``<% include FeatureImage %>`` or define the feature image div with class
     of 'feature-image'. It can contain any content; the background of this
     container will use the correct image based on media selectors. The theme
     needs to ensure that the display properties of this are set correctly for
     the images being used.
+    
+ *	This module requires Bootstrap and Jquery. Make sure you're including both.
+    
  *  In Page_Controller::init, add:
 
 ````
