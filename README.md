@@ -24,15 +24,13 @@ Page:
     container will use the correct image based on media selectors. The theme
     needs to ensure that the display properties of this are set correctly for
     the images being used.
-    
- *	This module requires Bootstrap and Jquery. Make sure you're including both.
-    
+        
  *  In Page_Controller::init, add:
 
 ````
     if ($this->dataRecord->hasExtension('FeaturedImagesExtension')) {
         $this->dataRecord->requireFeaturedImageCSS();
-		Requirements::css('govtnz_featureimage/css/featureimage.css');
+		Requirements::css('featureimage/css/featureimage.css');
     }
     
 ````
