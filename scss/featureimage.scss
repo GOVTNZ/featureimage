@@ -1,0 +1,21 @@
+// Small
+.feature-image {
+	background-color: grey;
+	height: 210px;
+	margin-top: -188px;
+}
+
+// Medium / Large
+@media (min-width: 768px) {
+	.feature-image {
+		height: 180px;
+		margin-top: 0;
+	}
+}
+
+// Extra large
+@media (min-width: 1367px) {
+	.feature-image {
+		height: 200px;
+	}
+}
