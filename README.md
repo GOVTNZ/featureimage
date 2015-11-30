@@ -7,6 +7,7 @@ FeatureImageExtension can be applied to a content page, and gives it behaviours 
     to the small, medium and large breakpoints.
  *  The module generates CSS files to import the images so that they
     can be included as background images, with no inline CSS.
+ *  The breakpoints match Bootstrap 3
 
 # Use
 
