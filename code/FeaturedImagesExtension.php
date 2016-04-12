@@ -25,6 +25,11 @@ class FeaturedImagesExtension extends DataExtension {
 		'FeaturedImageText' => 'Text'
 	);
 
+	/**
+	 * @config
+	 */
+	private static $disable_cms_fields;
+
 	private static $has_one = array(
 		'FeatureImageMobile' => 'Image',
 		'FeatureImageSmall' => 'Image',
@@ -36,17 +41,29 @@ class FeaturedImagesExtension extends DataExtension {
 	 * Add the 3 upload fields to a "Featured Images" tab in the CMS, for pages that have this extension.
 	 */
 	public function updateCMSFields(FieldList $fields) {
-		$fields->addFieldToTab('Root.FeatureImages', new TextField('FeaturedImageText', 'Describe the text on the featured image (if present)'));
+		if (self::$disable_cms_fields === true) {
+			return;
+		}
 
-        if ($this->owner->ClassName !== 'HomePage') {
-            $fields->addFieldToTab('Root.FeatureImages', $this->getUploadField('FeatureImageMobile', 'Mobile (<em>767 x 210 px</em>)'));
+		if ($this->owner->hasMethod('showFeatureImageAccessibleDescription')) {
+			if ($this->owner->showFeatureImageAccessibleDescription()) {
+				$fields->addFieldToTab('Root.FeatureImages', new TextField('FeaturedImageText', 'Describe the text on the featured image (if present)'));
+			}
+		}
+
+		if ($this->owner->hasMethod('showFeatureImageMobile')) {
+			if ($this->owner->showFeatureImageMobile()) {
+				$fields->addFieldToTab('Root.FeatureImages', $this->getUploadField('FeatureImageMobile', 'Mobile (<em>767 x 210 px</em>)'));
+			}
         }
 		$fields->addFieldToTab('Root.FeatureImages', $this->getUploadField('FeatureImageSmall', 'Small (<em>991 x 180 px</em>)'));
 		$fields->addFieldToTab('Root.FeatureImages', $this->getUploadField('FeatureImageMedium', 'Medium (<em>1366 x 180 px</em>)'));
-		$fields->addFieldToTab('Root.FeatureImages', $this->getUploadField('FeatureImageLarge', 'Large (<em>1920 x 200 px</em>)'));
+		$fields->addFieldToTab('Root.FeatureImages', $this->getUploadField('FeatureImageLarge', 'Large (<em>1920 x 250 px</em>)'));
 
-		if ($this->owner->ClassName == 'HomePage') {
-			$fields->addFieldToTab('Root.FeatureImages', new TextareaField('FeatureText', 'Feature text'));
+		if ($this->owner->hasMethod('showFeatureImageText')) {
+			if ($this->owner->showFeatureImageText()) {
+				$fields->addFieldToTab('Root.FeatureImages', new TextareaField('FeatureText', 'Feature text'));
+			}
 		}
 	}
 
@@ -122,7 +139,9 @@ class FeaturedImagesExtension extends DataExtension {
 	 */
 	public function onAfterWrite() {
 		// @todo(mark) determine if the fields have changed; only generate css if not present or fields have changed. hash contents.
-		$this->regenerateCSSFile();
+		if ($this->hasFeatureImages()) {
+			$this->regenerateCSSFile();
+		}
 	}
 
 	/**
@@ -176,15 +195,20 @@ class FeaturedImagesExtension extends DataExtension {
 			if (($file && $file->ID) || $previousFile) {
 				if ($file && $file->ID) {
 					// Use the file URL if the file is present for this size.
-					// $url = $file->getAbsoluteURL();
-					$url = "./" . $file->Name;
+					// Implementation note: use of relative URLs has been discontinued as it doesn't work for images
+					// that are linked from other parts of files and images. Using getAbsoluteURL works for all cases
+					// including renaming, but doesn't work if the site is not running as a virtual host.
+					$url = $file->getAbsoluteURL();
+					// $url = "./" . $file->Name;
 				}
-				else {
+				else if ($previousFile) {
 					// Use the previous file if there is no file, which means using the image from a larger
 					// responsive breakpoint. This relies on the fact that the image heights are all the
 					// same, and the images are centered.
-					$url = "./" . $previousFile->Name;
-					// $url = $previous->getAbsoluteURL();
+					$url = $previousFile->getAbsoluteURL();
+					// $url = "./" . $previousFile->Name;
+				} else {
+					$url = '';
 				}
 
 				// // remove the protocol and host from the URL. This means the path will be absolute relative to
@@ -217,7 +241,8 @@ class FeaturedImagesExtension extends DataExtension {
 			$css = "@media (max-width: 767px) {\n";
 			$css .= "\t.feature-image {\n";
 			$css .= "\t\tdisplay: block!important; margin-bottom: 0!important;\n";
-			$css .= "\t}.feature-image .row{margin-top: 188px!important;}\n";
+			$css .= "\t}\n";
+			$css .= "\t.feature-image .row{margin-top: 188px!important;}\n";
 			$css .= "}\n\n";
 		}
 		else {
@@ -270,5 +295,9 @@ class FeaturedImagesExtension extends DataExtension {
 			}
 		}
 		return false;
+	}
+
+	public static function set_disable_cms_fields($val) {
+		self::$disable_cms_fields = $val;
 	}
 }

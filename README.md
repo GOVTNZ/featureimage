@@ -38,6 +38,23 @@ Page:
     
 This is required because while the extension adds behaviour to the page, the controller is what adds in the requirements.
 
+ *  Enable extra fields per class to allow text on top of the feature image, 
+    addition of a mobile sized feature image, and a screen-reader only description 
+    of the image (uses bootstrap sr-only class)
+ 
+ ````
+	public function showFeatureImageText() {
+		return true;
+	}
+
+	public function showFeatureImageMobile() {
+		return true;
+	}
+
+	public function showFeatureImageAccessibleDescription() {
+		return true;
+	}
+ ````
 
 
 # CMS Behaviour
