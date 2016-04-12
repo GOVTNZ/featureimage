@@ -1,21 +1,28 @@
-// Small
-.feature-image {
-	background-color: grey;
-	height: 210px;
-}
-
-// Medium / Large
-@media (min-width: 768px) {
+@media (max-width: 1366px) {
 	.feature-image {
 		height: 180px;
-		margin-top: 0;
+	}
+	h1.feature-text {
+		width: 50%;
+		font-size: 1.6em;
 	}
 }
 
-// Extra large
 @media (min-width: 1367px) {
 	.feature-image {
 		height: 250px;
+	}
+}
+
+@media (min-width: 1199px) and (max-width: 1368px) {
+	h1.feature-text {
+		width: 40%;
+	}
+}
+
+@media(max-width: 767px) {
+	.feature-image {
+		height: 210px;
 	}
 }
 
@@ -24,5 +31,9 @@
 
 	> * {
 		color: white;
+	}
+
+	h1 {
+		font-weight: normal;
 	}
 }
