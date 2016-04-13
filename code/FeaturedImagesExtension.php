@@ -28,7 +28,7 @@ class FeaturedImagesExtension extends DataExtension {
 	/**
 	 * @config
 	 */
-	private static $disable_cms_fields;
+	private static $enable_cms_fields = true;
 
 	private static $has_one = array(
 		'FeatureImageMobile' => 'Image',
@@ -41,7 +41,7 @@ class FeaturedImagesExtension extends DataExtension {
 	 * Add the 3 upload fields to a "Featured Images" tab in the CMS, for pages that have this extension.
 	 */
 	public function updateCMSFields(FieldList $fields) {
-		if (self::$disable_cms_fields === true) {
+		if (self::$enable_cms_fields === false) {
 			return;
 		}
 
@@ -297,7 +297,7 @@ class FeaturedImagesExtension extends DataExtension {
 		return false;
 	}
 
-	public static function set_disable_cms_fields($val) {
-		self::$disable_cms_fields = $val;
+	public static function set_enable_cms_fields($val) {
+		self::$enable_cms_fields = $val;
 	}
 }
