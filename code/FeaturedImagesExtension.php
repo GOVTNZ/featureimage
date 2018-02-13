@@ -211,12 +211,12 @@ class FeaturedImagesExtension extends DataExtension {
 					$url = '';
 				}
 
-				// // remove the protocol and host from the URL. This means the path will be absolute relative to
-				// // web root, and will still work in dev environments.
-				// $host = Director::protocolAndHost();
-				// if (substr($url, 0, strlen($host)) == $host) {
-				// 	$url = substr($url, strlen($host));
-				// }
+				 // remove the protocol and host from the URL. This means the path will be absolute relative to
+				 // web root, and will still work in dev environments.
+				 $host = Director::protocolAndHost();
+				 if (substr($url, 0, strlen($host)) == $host) {
+				 	$url = substr($url, strlen($host));
+				 }
 
 				// Remember the url of the largest image we find. This is what we'll use for IE8
 				if (!$urlLargest) {
