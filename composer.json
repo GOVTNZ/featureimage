@@ -1,23 +1,26 @@
 {
-  "name": "govtnz/featureimage",
+  "name": "govtnz/silverstripe-featureimage",
   "description": "Banner-style multi-size image implementation",
   "type": "silverstripe-module",
   "homepage": "https://github.com/GOVTNZ/featureimage",
   "keywords": ["silverstripe", "banner", "banner image", "responsive"],
   "license": "MIT",
-  "authors": [
-	{
-	  "name": "Julian Thomson","email": "thebreaks@live.com"
-	}
-  ],
-  "support": {
-	"issues": "https://github.com/GOVTNZ/featureimage/issues"
-  },
-  "require": {
-	"silverstripe/cms": "~3.2",
-	"silverstripe/framework": "~3.2"
-  },
-  "extra": {
-	"installer-name": "featureimage"
-  }
+    "authors": [{
+      "name": "Govt.nz",
+      "email": "govtnz@dia.govt.nz"
+    }],
+    "require": {
+        "silverstripe/framework": "^4",
+        "silverstripe/cms": "^4"
+    },
+    "autoload": {
+        "psr-4": {
+            "GovtNZ\\SilverStripe\\FeatureImage": "src"
+        }
+    },
+    "extra": {
+      "branch-alias": {
+        "dev-master": "2.x-dev"
+      }
+    }
 }
