@@ -15,7 +15,7 @@
     },
     "autoload": {
         "psr-4": {
-            "GovtNZ\\SilverStripe\\FeatureImage": "src"
+            "GovtNZ\\SilverStripe\\FeatureImage\\": "src"
         }
     },
     "extra": {
