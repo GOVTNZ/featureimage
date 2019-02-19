@@ -1,7 +1,7 @@
 {
   "name": "govtnz/silverstripe-featureimage",
   "description": "Banner-style multi-size image implementation",
-  "type": "silverstripe-module",
+  "type": "silverstripe-vendormodule",
   "homepage": "https://github.com/GOVTNZ/featureimage",
   "keywords": ["silverstripe", "banner", "banner image", "responsive"],
   "license": "MIT",
@@ -21,6 +21,9 @@
     "extra": {
       "branch-alias": {
         "dev-master": "2.x-dev"
-      }
+      },
+      "expose": [
+        "css"
+      ]
     }
 }
