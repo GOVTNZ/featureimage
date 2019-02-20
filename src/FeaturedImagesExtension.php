@@ -5,6 +5,8 @@ namespace GovtNZ\SilverStripe\FeatureImage;
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\Forms\TextField;
 use SilverStripe\Forms\TextareaField;
+use SilverStripe\Forms\FieldList;
+use SilverStripe\Assets\Image;
 
 /**
  * FeatureImageExtension is a an extension that can be applied to a content page type to give it
@@ -27,22 +29,22 @@ class FeaturedImagesExtension extends DataExtension
 
     var $_cachedFolderPath;
 
-    private static $db = array(
+    private static $db = [
         'FeatureText' => 'Text',
         'FeaturedImageText' => 'Text'
-    );
+    ];
 
     /**
      * @config
      */
     private static $enable_cms_fields = true;
 
-    private static $has_one = array(
-        'FeatureImageMobile' => 'Image',
-        'FeatureImageSmall' => 'Image',
-        'FeatureImageMedium' => 'Image',
-        'FeatureImageLarge' => 'Image'
-    );
+    private static $has_one = [
+        'FeatureImageMobile' => Image::class,
+        'FeatureImageSmall' => Image::class,
+        'FeatureImageMedium' => Image::class,
+        'FeatureImageLarge' => Image::class
+    ];
 
     /**
      * Add the 3 upload fields to a "Featured Images" tab in the CMS, for pages that have this extension.
