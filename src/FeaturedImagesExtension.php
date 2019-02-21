@@ -7,7 +7,8 @@ use SilverStripe\Forms\TextField;
 use SilverStripe\Forms\TextareaField;
 use SilverStripe\Forms\FieldList;
 use SilverStripe\Assets\Image;
-
+use SilverStripe\AssetAdmin\Forms\UploadField;
+use SilverStripe\Assets\Folder;
 /**
  * FeatureImageExtension is a an extension that can be applied to a content page type to give it
  * a set of behaviours for handling feature images:
@@ -20,14 +21,11 @@ use SilverStripe\Assets\Image;
  */
 class FeaturedImagesExtension extends DataExtension
 {
+    private static $feature_images_root = "feature-images/";
 
-    // Folder that will contain sub-folders for different pages. Relative to assets directory.
-    static $feature_images_root = "feature-images/";
+    private static $css_include_name = "include.css";
 
-    // File name given to generated CSS files, within each featured image folder.
-    static $css_include_name = "include.css";
-
-    var $_cachedFolderPath;
+    private $_cachedFolderPath;
 
     private static $db = [
         'FeatureText' => 'Text',
