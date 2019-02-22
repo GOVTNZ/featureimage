@@ -27,6 +27,18 @@ class FeaturedImagesExtension extends DataExtension
 
     private $_cachedFolderPath;
 
+    /**
+     * mapping of bootstrap media sizes to the relation names that contain the
+     * images. These are the default sizes. We go from larger to smaller, so
+     * that if a smaller image is missing, we can use the next larger one.
+     */
+    protected $responsiveData = [
+        '1367px' => 'FeatureImageLarge',        // corresponds to screen-lg-min
+        '992px' => 'FeatureImageMedium',        // corresponds to screen-md-min
+        '768px' => 'FeatureImageSmall',            // corresponds to screen-sm-min
+        '1px' => 'FeatureImageMobile'
+    ];
+
     private static $db = [
         'FeatureText' => 'Text',
         'FeaturedImageText' => 'Text'
@@ -44,8 +56,16 @@ class FeaturedImagesExtension extends DataExtension
         'FeatureImageLarge' => Image::class
     ];
 
+    private static $owns = [
+        'FeatureImageMobile',
+        'FeatureImageSmall',
+        'FeatureImageMedium',
+        'FeatureImageLarge'
+    ];
+
     /**
-     * Add the 3 upload fields to a "Featured Images" tab in the CMS, for pages that have this extension.
+     * Add the 3 upload fields to a "Featured Images" tab in the CMS, for pages
+     * that have this extension.
      */
     public function updateCMSFields(FieldList $fields)
     {
@@ -76,7 +96,8 @@ class FeaturedImagesExtension extends DataExtension
     }
 
     /**
-     * Helper to create an upload field with the correct path, which ensures that the uploader puts files in the right place
+     * Helper to create an upload field with the correct path, which ensures
+     * that the uploader puts files in the right place.
      */
     protected function getUploadField($field, $caption)
     {
@@ -87,10 +108,13 @@ class FeaturedImagesExtension extends DataExtension
     }
 
     /**
-     * Return the path we should use for feature images and related CSS for this page. It works as follows:
-     * - if a folder exists under feature_images_root whose name starts with nnn_ where nnn is the ID of the page,
+     * Return the path we should use for feature images and related CSS for
+     * this page. It works as follows:
+     * - if a folder exists under feature_images_root whose name starts with
+     * nnn_ where nnn is the ID of the page,
      *     that path is returned.
-     * - otherwise that folder path is created. The name of the folder will be nnn_tttt where nnn is the ID of the page
+     * - otherwise that folder path is created. The name of the folder will be
+     * nnn_tttt where nnn is the ID of the page
      *   and tttt is the URL segment, stripped of punctuation.
      * The folder path should have a trailing slash.
      */
@@ -108,16 +132,18 @@ class FeaturedImagesExtension extends DataExtension
                 $this->_cachedFolderPath .= "/";
             }
         }
+
         return $this->_cachedFolderPath;
     }
 
     /**
-     * Determine if there is a folder for this page's ID already. If so, return its path relative to
-     * assets. If not, return null.
+     * Determine if there is a folder for this page's ID already. If so, return
+     * its path relative to assets. If not, return null.
      */
     protected function findExisting()
     {
         $base = Folder::find_or_make(self::$feature_images_root);
+
         foreach ($base->Children() as $child) {
             $parts = explode("-", $child->Name);
             if ($parts[0] == $this->owner->ID) {
@@ -138,27 +164,29 @@ class FeaturedImagesExtension extends DataExtension
     protected function createFolder()
     {
         $path = self::$feature_images_root . $this->owner->ID . "_" . $this->owner->URLSegment;
-        // @todo is any sanitation required? exception handling?
         Folder::find_or_make($path);
+
         return $path;
     }
 
     /**
-     * After a write, we need to ensure that the images are in the right folder. This is required because UploadField
-     * ignores the path to save to, and just puts the files in Uploads. So we iterate over the images we have, move them
-     * to the right place if they are in the wrong place, and then generate a CSS file that can be included.
+     * After a write, we need to ensure that the images are in the right
+     * folder. This is required because UploadField ignores the path to save to,
+     * and just puts the files in Uploads. So we iterate over the images we
+     * have, move them to the right place if they are in the wrong place, and
+     * then generate a CSS file that can be included.
      */
     public function onAfterWrite()
     {
-        // @todo(mark) determine if the fields have changed; only generate css if not present or fields have changed. hash contents.
         if ($this->hasFeatureImages()) {
             $this->regenerateCSSFile();
         }
     }
 
     /**
-     * Generate a CSS file with the correct rules that references the images that have been uploaded. The CSS file is
-     * stored in the correct folder for this page.
+     * Generate a CSS file with the correct rules that references the images
+     * that have been uploaded. The CSS file is stored in the correct folder
+     * for this page.
      */
     protected function regenerateCSSFile()
     {
@@ -167,13 +195,14 @@ class FeaturedImagesExtension extends DataExtension
         $folder = Folder::find_or_make($this->getFolderPath());
 
         // Create the file, with the CSS content in it.
-        $path = 'assets/' . $this->getCSSPath();
-        $fh = fopen(BASE_PATH . '/' . $path, "w");
+        $path = ASSETS_PATH . $this->getCSSPath();
+
+        $fh = fopen($path, "w");
         fwrite($fh, $css);
         fclose($fh);
 
         // Create the File reference that points to the physical file.
-        $file = new File();
+        $file = File::create();
         $file->Name = self::$css_include_name;
         $file->Filename = $path;
 
@@ -181,15 +210,6 @@ class FeaturedImagesExtension extends DataExtension
         $file->ParentID = $folder->ID;
         $file->write();
     }
-
-    // mapping of bootstrap media sizes to the relation names that contain the images. These are the default
-    // sizes. We go from larger to smaller, so that if a smaller image is missing, we can use the next larger one.
-    protected $responsiveData = array(
-        '1367px' => 'FeatureImageLarge',        // corresponds to screen-lg-min
-        '992px' => 'FeatureImageMedium',        // corresponds to screen-md-min
-        '768px' => 'FeatureImageSmall',            // corresponds to screen-sm-min
-        '1px' => 'FeatureImageMobile'
-    );
 
     /**
      * Generate the CSS content.
@@ -249,6 +269,7 @@ class FeaturedImagesExtension extends DataExtension
                 $previousFile = $file;
             }
         }
+
         if ($this->owner->FeatureImageMobileID > 0) {
             // Media rule is to show the feature image on mobile only if there is one.
             $css = "@media (max-width: 767px) {\n";
@@ -266,18 +287,21 @@ class FeaturedImagesExtension extends DataExtension
             $css .= "\t}\n";
             $css .= "}\n\n";
         }
+
         $clauses[] = $css;
 
-        // We've added them in the reverse order they need to appear in the CSS file, so we could process large->small,
-        // so do a final reverse of the clauses.
+        // We've added them in the reverse order they need to appear in the CSS
+        // file, so we could process large->small, so do a final reverse of the
+        // clauses.
         $clauses = array_reverse($clauses);
 
         return implode("\n", $clauses);
     }
 
     /**
-     * Return the path of the CSS file for this page. This will either be because we are generating the file, or because
-     * we are requiring it's path when rendering the page on the front end.
+     * Return the path of the CSS file for this page. This will either be
+     * because we are generating the file, or because we are requiring it's
+     * path when rendering the page on the front end.
      */
     protected function getCSSPath()
     {
@@ -285,8 +309,10 @@ class FeaturedImagesExtension extends DataExtension
     }
 
     /**
-     * Use Requirements system to pull in the CSS file for this page. This should be invoked whenever a page that
-     * has this extension is being rendered. Typical usage is to put it in init() of the page types controller class.
+     * Use Requirements system to pull in the CSS file for this page. This
+     * should be invoked whenever a page that has this extension is being
+     * rendered. Typical usage is to put it in init() of the page types
+     * controller class.
      */
     public function requireFeaturedImageCSS()
     {
@@ -297,20 +323,31 @@ class FeaturedImagesExtension extends DataExtension
     }
 
     /**
-     * Return true if the extended page has any featured images, false if not. Even if there is only
-     * one featured image, it will return true, as the it may fall back to a bigger image.
+     * Return true if the extended page has any featured images, false if not.
+     * Even if there is only one featured image, it will return true, as the it
+     * may fall back to a bigger image.
+     *
+     * @return boolean
      */
     public function hasFeatureImages()
     {
         foreach ($this->responsiveData as $size => $relName) {
+            if (!$this->owner->hasMethod($relName)) {
+                continue;
+            }
+
             $file = $this->owner->$relName();
+
             if ($file && $file->ID) {
-                return true; // found one
+                return true;
             }
         }
         return false;
     }
 
+    /**
+     * @param boolean $val
+     */
     public static function set_enable_cms_fields($val)
     {
         self::$enable_cms_fields = $val;

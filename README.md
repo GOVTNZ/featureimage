@@ -17,7 +17,7 @@ FeatureImageExtension can be applied to a content page, and gives it behaviours 
 ````
 Page:
 	extensions:
-		- FeaturedImagesExtension
+		- GovtNZ\SilverStripe\FeatureImage\FeaturedImagesExtension
 ````
     
  *  In the template, use ``<% include FeatureImage %>`` or define the feature image div with class
@@ -29,7 +29,7 @@ Page:
  *  In Page_Controller::init, add:
 
 ````
-    if ($this->dataRecord->hasExtension('FeaturedImagesExtension')) {
+    if ($this->dataRecord->hasExtension(FeaturedImagesExtension::class)) {
         $this->dataRecord->requireFeaturedImageCSS();
 		Requirements::css('featureimage/css/featureimage.css');
     }
