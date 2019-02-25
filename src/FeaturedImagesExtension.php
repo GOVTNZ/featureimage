@@ -81,12 +81,22 @@ class FeaturedImagesExtension extends DataExtension
 
         if ($this->owner->hasMethod('showFeatureImageMobile')) {
             if ($this->owner->showFeatureImageMobile()) {
-                $fields->addFieldToTab('Root.FeatureImages', $this->getUploadField('FeatureImageMobile', 'Mobile (<em>767 x 210 px</em>)'));
+                $fields->addFieldToTab('Root.FeatureImages',
+                    $this->getUploadField('FeatureImageMobile', 'Mobile')->setDescription('767 x 210 px')
+                );
             }
         }
-        $fields->addFieldToTab('Root.FeatureImages', $this->getUploadField('FeatureImageSmall', 'Small (<em>991 x 180 px</em>)'));
-        $fields->addFieldToTab('Root.FeatureImages', $this->getUploadField('FeatureImageMedium', 'Medium (<em>1366 x 180 px</em>)'));
-        $fields->addFieldToTab('Root.FeatureImages', $this->getUploadField('FeatureImageLarge', 'Large (<em>1920 x 250 px</em>)'));
+        $fields->addFieldToTab('Root.FeatureImages',
+            $this->getUploadField('FeatureImageSmall', 'Small')->setDescription('991 x 180 px')
+        );
+
+        $fields->addFieldToTab('Root.FeatureImages',
+            $this->getUploadField('FeatureImageMedium', 'Medium')->setDescription('1366 x 180 px')
+        );
+
+        $fields->addFieldToTab('Root.FeatureImages',
+            $this->getUploadField('FeatureImageLarge', 'Large')->setDescription('1920 x 250 px')
+        );
 
         if ($this->owner->hasMethod('showFeatureImageText')) {
             if ($this->owner->showFeatureImageText()) {
@@ -101,9 +111,10 @@ class FeaturedImagesExtension extends DataExtension
      */
     protected function getUploadField($field, $caption)
     {
-        $field = new UploadField($field, $caption);
+        $field = UploadField::create("{$field}ID", $caption);
         $path = $this->getFolderPath();
         $field->setFolderName($path);
+
         return $field;
     }
 
