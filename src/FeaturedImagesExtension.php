@@ -9,6 +9,7 @@ use SilverStripe\Forms\FieldList;
 use SilverStripe\Assets\Image;
 use SilverStripe\AssetAdmin\Forms\UploadField;
 use SilverStripe\Assets\Folder;
+
 /**
  * FeatureImageExtension is a an extension that can be applied to a content page type to give it
  * a set of behaviours for handling feature images:
@@ -81,20 +82,24 @@ class FeaturedImagesExtension extends DataExtension
 
         if ($this->owner->hasMethod('showFeatureImageMobile')) {
             if ($this->owner->showFeatureImageMobile()) {
-                $fields->addFieldToTab('Root.FeatureImages',
+                $fields->addFieldToTab(
+                    'Root.FeatureImages',
                     $this->getUploadField('FeatureImageMobile', 'Mobile')->setDescription('767 x 210 px')
                 );
             }
         }
-        $fields->addFieldToTab('Root.FeatureImages',
+        $fields->addFieldToTab(
+            'Root.FeatureImages',
             $this->getUploadField('FeatureImageSmall', 'Small')->setDescription('991 x 180 px')
         );
 
-        $fields->addFieldToTab('Root.FeatureImages',
+        $fields->addFieldToTab(
+            'Root.FeatureImages',
             $this->getUploadField('FeatureImageMedium', 'Medium')->setDescription('1366 x 180 px')
         );
 
-        $fields->addFieldToTab('Root.FeatureImages',
+        $fields->addFieldToTab(
+            'Root.FeatureImages',
             $this->getUploadField('FeatureImageLarge', 'Large')->setDescription('1920 x 250 px')
         );
 
