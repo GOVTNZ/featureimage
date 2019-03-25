@@ -3,10 +3,10 @@
 namespace GovtNZ\SilverStripe\FeatureImage;
 
 use SilverStripe\ORM\DataExtension;
+use SilverStirpe\Assets\Image;
 use SilverStripe\Forms\TextField;
 use SilverStripe\Forms\TextareaField;
 use SilverStripe\Forms\FieldList;
-use SilverStripe\Assets\Image;
 use SilverStripe\AssetAdmin\Forms\UploadField;
 use SilverStripe\Assets\Folder;
 
@@ -20,35 +20,14 @@ use SilverStripe\Assets\Folder;
  *
  * See README.md for more info on usage.
  */
-class FeaturedImagesExtension extends DataExtension
+class Images extends DataExtension
 {
-    private static $feature_images_root = "feature-images/";
-
-    private static $css_include_name = "include.css";
-
-    private $_cachedFolderPath;
-
-    /**
-     * mapping of bootstrap media sizes to the relation names that contain the
-     * images. These are the default sizes. We go from larger to smaller, so
-     * that if a smaller image is missing, we can use the next larger one.
-     */
-    protected $responsiveData = [
-        '1367px' => 'FeatureImageLarge',        // corresponds to screen-lg-min
-        '992px' => 'FeatureImageMedium',        // corresponds to screen-md-min
-        '768px' => 'FeatureImageSmall',            // corresponds to screen-sm-min
-        '1px' => 'FeatureImageMobile'
-    ];
+    protected $imagesEnabled = true;
 
     private static $db = [
-        'FeatureText' => 'Text',
+        'FeatureText' => 'Text', 
         'FeaturedImageText' => 'Text'
     ];
-
-    /**
-     * @config
-     */
-    private static $enable_cms_fields = true;
 
     private static $has_one = [
         'FeatureImageMobile' => Image::class,
@@ -64,14 +43,43 @@ class FeaturedImagesExtension extends DataExtension
         'FeatureImageLarge'
     ];
 
+        /**
+     * mapping of bootstrap media sizes to the relation names that contain the
+     * images. These are the default sizes. We go from larger to smaller, so
+     * that if a smaller image is missing, we can use the next larger one.
+     */
+    protected $responsiveData = [
+        '1367px' => 'FeatureImageLarge',        // corresponds to screen-lg-min
+        '992px' => 'FeatureImageMedium',        // corresponds to screen-md-min
+        '768px' => 'FeatureImageSmall',            // corresponds to screen-sm-min
+        '1px' => 'FeatureImageMobile'
+    ];
+
+    private static $feature_images_root = "feature-images/";
+
+    private static $css_include_name = "include.css";
+
+    private $_cachedFolderPath;
+
+    /**
+     * @config
+     */
+    private static $enable_cms_fields = true;
+
     /**
      * Add the 3 upload fields to a "Featured Images" tab in the CMS, for pages
      * that have this extension.
      */
     public function updateCMSFields(FieldList $fields)
     {
-        if (self::$enable_cms_fields === false) {
+        if ($this->imagesEnabled === false) {
             return;
+        }
+
+        if ($this->owner->hasMethod('shouldEnableFeatureImages')) {
+            if (!$this->owner->shouldEnableFeatureImages()) {
+                return;
+            }
         }
 
         if ($this->owner->hasMethod('showFeatureImageAccessibleDescription')) {
@@ -114,12 +122,12 @@ class FeaturedImagesExtension extends DataExtension
      * Helper to create an upload field with the correct path, which ensures
      * that the uploader puts files in the right place.
      */
-    protected function getUploadField($field, $caption)
+    protected function getUploadField($fieldName, $caption)
     {
-        $field = UploadField::create("{$field}ID", $caption);
+        $field = UploadField::create("{$fieldName}", $caption);
         $path = $this->getFolderPath();
         $field->setFolderName($path);
-
+        
         return $field;
     }
 
@@ -363,9 +371,13 @@ class FeaturedImagesExtension extends DataExtension
 
     /**
      * @param boolean $val
+     * 
+     * @return
      */
-    public static function set_enable_cms_fields($val)
+    public function setFeaturedImagesEnabled($val)
     {
-        self::$enable_cms_fields = $val;
+        $this->imagesEnabled = $val;
+
+        return $this->owner;
     }
 }
