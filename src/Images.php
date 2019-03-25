@@ -3,7 +3,7 @@
 namespace GovtNZ\SilverStripe\FeatureImage;
 
 use SilverStripe\ORM\DataExtension;
-use SilverStirpe\Assets\Image;
+use SilverStripe\Assets\Image;
 use SilverStripe\Forms\TextField;
 use SilverStripe\Forms\TextareaField;
 use SilverStripe\Forms\FieldList;
