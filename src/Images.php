@@ -12,6 +12,7 @@ use SilverStripe\Control\Director;
 use SilverStripe\Control\Controller;
 use SilverStripe\AssetAdmin\Forms\UploadField;
 use SilverStripe\Assets\Folder;
+use SilverStripe\View\Requirements;
 
 /**
  * FeatureImageExtension is a an extension that can be applied to a content page type to give it
