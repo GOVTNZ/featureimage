@@ -4,9 +4,12 @@ namespace GovtNZ\SilverStripe\FeatureImage;
 
 use SilverStripe\ORM\DataExtension;
 use SilverStripe\Assets\Image;
+use SilverStripe\Assets\File;
 use SilverStripe\Forms\TextField;
 use SilverStripe\Forms\TextareaField;
 use SilverStripe\Forms\FieldList;
+use SilverStripe\Control\Director;
+use SilverStripe\Control\Controller;
 use SilverStripe\AssetAdmin\Forms\UploadField;
 use SilverStripe\Assets\Folder;
 
@@ -145,13 +148,8 @@ class Images extends DataExtension
     protected function getFolderPath()
     {
         if (!$this->_cachedFolderPath) {
-            $f = $this->findExisting();
-            if ($f) {
-                $this->_cachedFolderPath = $f;
-            } else {
-                $this->_cachedFolderPath = $this->createFolder();
-            }
-
+            $this->_cachedFolderPath = $this->createFolder();
+            
             if (substr($this->_cachedFolderPath, -1) != "/") {
                 $this->_cachedFolderPath .= "/";
             }
@@ -160,35 +158,14 @@ class Images extends DataExtension
         return $this->_cachedFolderPath;
     }
 
-    /**
-     * Determine if there is a folder for this page's ID already. If so, return
-     * its path relative to assets. If not, return null.
-     */
-    protected function findExisting()
-    {
-        $base = Folder::find_or_make(self::$feature_images_root);
-
-        foreach ($base->Children() as $child) {
-            $parts = explode("-", $child->Name);
-            if ($parts[0] == $this->owner->ID) {
-                // return this path, but strip leading "assets/"
-                $result = $child->Filename;
-                if (substr($result, 0, 7) == "assets/") {
-                    $result = substr($result, 7);
-                }
-                return $result;
-            }
-        }
-        return null;
-    }
-
+   
     /**
      * Create the folder structure for this page, and return the path.
      */
     protected function createFolder()
     {
         $path = self::$feature_images_root . $this->owner->ID . "_" . $this->owner->URLSegment;
-        Folder::find_or_make($path);
+        @mkdir($path);
 
         return $path;
     }
@@ -216,23 +193,15 @@ class Images extends DataExtension
     {
         $css = $this->getCSS();
 
-        $folder = Folder::find_or_make($this->getFolderPath());
+        $folder = @mkdir($this->getFolderPath());
 
         // Create the file, with the CSS content in it.
-        $path = ASSETS_PATH . $this->getCSSPath();
-
+        $path = Controller::join_links(ASSETS_PATH, $this->getCSSPath());
+        
+        @mkdir(dirname($path));
         $fh = fopen($path, "w");
         fwrite($fh, $css);
         fclose($fh);
-
-        // Create the File reference that points to the physical file.
-        $file = File::create();
-        $file->Name = self::$css_include_name;
-        $file->Filename = $path;
-
-        // Make sure the new File has the correct parent folder.
-        $file->ParentID = $folder->ID;
-        $file->write();
     }
 
     /**
