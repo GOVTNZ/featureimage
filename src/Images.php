@@ -29,7 +29,7 @@ class Images extends DataExtension
     protected $imagesEnabled = true;
 
     private static $db = [
-        'FeatureText' => 'Text', 
+        'FeatureText' => 'Text',
         'FeaturedImageText' => 'Text'
     ];
 
@@ -129,8 +129,10 @@ class Images extends DataExtension
     protected function getUploadField($fieldName, $caption)
     {
         $field = UploadField::create("{$fieldName}", $caption);
-        $path = $this->getFolderPath();
-        $field->setFolderName($path);
+        $field->setFolderName(Controller::join_links(
+            self::$feature_images_root,
+            $this->owner->ID . "_" . $this->owner->URLSegment
+        ));
         
         return $field;
     }
@@ -150,22 +152,41 @@ class Images extends DataExtension
     {
         if (!$this->_cachedFolderPath) {
             $this->_cachedFolderPath = $this->createFolder();
-            
-            if (substr($this->_cachedFolderPath, -1) != "/") {
-                $this->_cachedFolderPath .= "/";
-            }
         }
 
         return $this->_cachedFolderPath;
     }
 
-   
+    /**
+     * Return the feature folder URL (rather than OS path)
+     */
+    protected function getFeatureFolderURL()
+    {
+        return Controller::join_links(
+            'assets',
+            self::$feature_images_root,
+            $this->owner->ID . "_" . $this->owner->URLSegment
+        );
+    }
+
     /**
      * Create the folder structure for this page, and return the path.
      */
     protected function createFolder()
     {
-        $path = self::$feature_images_root . $this->owner->ID . "_" . $this->owner->URLSegment;
+        $root = Controller::join_links(
+            ASSETS_PATH,
+            self::$feature_images_root
+        );
+
+        @mkdir($root);
+
+        $path = Controller::join_links(
+            ASSETS_PATH,
+            self::$feature_images_root,
+            $this->owner->ID . "_" . $this->owner->URLSegment
+        );
+
         @mkdir($path);
 
         return $path;
@@ -193,16 +214,16 @@ class Images extends DataExtension
     protected function regenerateCSSFile()
     {
         $css = $this->getCSS();
+        $path = $this->getFeatureCSSPath();
 
-        $folder = @mkdir($this->getFolderPath());
-
-        // Create the file, with the CSS content in it.
-        $path = Controller::join_links(ASSETS_PATH, $this->getCSSPath());
-        
-        @mkdir(dirname($path));
         $fh = fopen($path, "w");
         fwrite($fh, $css);
         fclose($fh);
+    }
+
+    public function featureImagesCSSExists()
+    {
+        return file_exists($this->getFeatureCSSPath());
     }
 
     /**
@@ -240,7 +261,8 @@ class Images extends DataExtension
 
                  // remove the protocol and host from the URL. This means the path will be absolute relative to
                  // web root, and will still work in dev environments.
-                 $host = Director::protocolAndHost();
+                $host = Director::protocolAndHost();
+
                 if (substr($url, 0, strlen($host)) == $host) {
                     $url = substr($url, strlen($host));
                 }
@@ -297,9 +319,20 @@ class Images extends DataExtension
      * because we are generating the file, or because we are requiring it's
      * path when rendering the page on the front end.
      */
-    protected function getCSSPath()
+    public function getFeatureCSSPath()
     {
-        return $this->getFolderPath() . self::$css_include_name;
+        return Controller::join_links(
+            $this->getFolderPath(), 
+            self::$css_include_name
+        );
+    }
+
+    public function getFeatureCSSURL()
+    {
+        return Controller::join_links(
+            $this->getFeatureFolderURL(), 
+            self::$css_include_name
+        );
     }
 
     /**
@@ -312,7 +345,9 @@ class Images extends DataExtension
     {
         if ($this->hasFeatureImages()) {
             // just use requirements to pull in the CSS.
-            Requirements::css('assets/' . $this->getCSSPath());
+            if ($this->featureImagesCSSExists()) {
+                Requirements::css($this->getFeatureCSSURL());
+            }
         }
     }
 
@@ -341,7 +376,7 @@ class Images extends DataExtension
 
     /**
      * @param boolean $val
-     * 
+     *
      * @return
      */
     public function setFeaturedImagesEnabled($val)
