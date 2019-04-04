@@ -322,7 +322,7 @@ class Images extends DataExtension
     public function getFeatureCSSPath()
     {
         return Controller::join_links(
-            $this->getFolderPath(), 
+            $this->getFolderPath(),
             self::$css_include_name
         );
     }
@@ -330,7 +330,7 @@ class Images extends DataExtension
     public function getFeatureCSSURL()
     {
         return Controller::join_links(
-            $this->getFeatureFolderURL(), 
+            $this->getFeatureFolderURL(),
             self::$css_include_name
         );
     }
