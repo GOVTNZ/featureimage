@@ -166,7 +166,20 @@ class FeaturedImagesExtension extends DataExtension {
 
 		// Make sure the new File has the correct parent folder.
 		$file->ParentID = $folder->ID;
+
+		// Make sure CSS files can be saved (otherwise there will be a validation error).
+		$allowed = array_map('strtolower', Config::inst()->get('File', 'allowed_extensions'));
+		$cssAllowed = in_array('css', $allowed);
+		if (!$cssAllowed) {
+			Config::inst()->update('File', 'allowed_extensions', array_merge(['css'], $allowed));
+		}
+
 		$file->write();
+
+		// If we have added CSS as an allowed extension, remove it.
+		if (!$cssAllowed) {
+			Config::inst()->update('File', 'allowed_extensions', $allowed);
+		}
 	}
 
 	// mapping of bootstrap media sizes to the relation names that contain the images. These are the default
