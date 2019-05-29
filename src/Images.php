@@ -13,10 +13,13 @@ use SilverStripe\Control\Controller;
 use SilverStripe\AssetAdmin\Forms\UploadField;
 use SilverStripe\Assets\Folder;
 use SilverStripe\View\Requirements;
+use SilverStripe\Core\Injector\Injector;
+use Psr\Log\LoggerInterface;
+use Exception;
 
 /**
- * FeatureImageExtension is a an extension that can be applied to a content page type to give it
- * a set of behaviours for handling feature images:
+ * FeatureImageExtension is a an extension that can be applied to a content
+ * page type to give it a set of behaviours for handling feature images:
  *
  *    * a "Featured Images" tab in the CMS
  *    * 3 image uploader fields. These let a CMS user upload 3 variations of the feature image,
@@ -47,7 +50,7 @@ class Images extends DataExtension
         'FeatureImageLarge'
     ];
 
-        /**
+    /**
      * mapping of bootstrap media sizes to the relation names that contain the
      * images. These are the default sizes. We go from larger to smaller, so
      * that if a smaller image is missing, we can use the next larger one.
@@ -133,7 +136,7 @@ class Images extends DataExtension
             self::$feature_images_root,
             $this->owner->ID . "_" . $this->owner->URLSegment
         ));
-        
+
         return $field;
     }
 
@@ -345,6 +348,14 @@ class Images extends DataExtension
     {
         if ($this->hasFeatureImages()) {
             // just use requirements to pull in the CSS.
+            if (!$this->featureImagesCSSExists()) {
+                try {
+                    $this->regenerateCSSFile();
+                } catch (Exception $e) {
+                    Injector::inst()->get(LoggerInterface::class)->warning($e->getMessage());
+                }
+            }
+
             if ($this->featureImagesCSSExists()) {
                 Requirements::css($this->getFeatureCSSURL());
             }
