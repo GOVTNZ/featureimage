@@ -216,12 +216,17 @@ class Images extends DataExtension
      */
     protected function regenerateCSSFile()
     {
+        $this->createFolder();
+
         $css = $this->getCSS();
         $path = $this->getFeatureCSSPath();
 
-        $fh = fopen($path, "w");
-        fwrite($fh, $css);
-        fclose($fh);
+        $fh = @fopen($path, "w");
+
+        if ($fh) {
+            fwrite($fh, $css);
+            fclose($fh);
+        }
     }
 
     public function featureImagesCSSExists()
