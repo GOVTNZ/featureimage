@@ -300,7 +300,6 @@ class Images extends DataExtension
             $css .= "\t.feature-image {\n";
             $css .= "\t\tdisplay: block!important; margin-bottom: 0!important;\n";
             $css .= "\t}\n";
-            $css .= "\t.feature-image .row{margin-top: 188px!important;}\n";
             $css .= "}\n\n";
         } else {
             // Media rule is to hide the feature image completely on mobile. Other sizes will override.
