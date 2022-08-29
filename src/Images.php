@@ -271,7 +271,7 @@ class Images extends DataExtension
                  // web root, and will still work in dev environments.
                 $host = Director::protocolAndHost();
 
-                if (substr($url, 0, strlen($host)) == $host) {
+                if (substr($url ?? '', 0, strlen($host)) == $host) {
                     $url = substr($url, strlen($host));
                 }
 
