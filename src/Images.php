@@ -32,7 +32,6 @@ class Images extends DataExtension
     protected $imagesEnabled = true;
 
     private static $db = [
-        'FeatureText' => 'Text',
         'FeaturedImageText' => 'Text'
     ];
 
@@ -117,12 +116,6 @@ class Images extends DataExtension
             'Root.FeatureImages',
             $this->getUploadField('FeatureImageLarge', 'Large')->setDescription('1920 x 250 px')
         );
-
-        if ($this->owner->hasMethod('showFeatureImageText')) {
-            if ($this->owner->showFeatureImageText()) {
-                $fields->addFieldToTab('Root.FeatureImages', new TextareaField('FeatureText', 'Feature text'));
-            }
-        }
     }
 
     /**
