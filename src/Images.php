@@ -105,7 +105,7 @@ class Images extends DataExtension
         }
         $fields->addFieldToTab(
             'Root.FeatureImages',
-            $this->getUploadField('FeatureImageSmall', 'Small')->setDescription('991 x 180 px')
+            $this->getUploadField('FeatureImageSmall', 'Tiny')->setDescription('991 x 180 px')
         );
 
         $fields->addFieldToTab(
